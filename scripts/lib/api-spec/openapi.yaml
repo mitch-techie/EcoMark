@@ -1,0 +1,122 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: ecomark
+    description: EcoMark carbon footprint operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /ecomark/calculate:
+    post:
+      operationId: calculateFootprint
+      tags: [ecomark]
+      summary: Calculate carbon footprint
+      description: Calculates a carbon score and returns AI-powered sustainability tips
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FootprintInput"
+      responses:
+        "200":
+          description: Carbon footprint result with tips
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FootprintResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    FootprintInput:
+      type: object
+      properties:
+        transport:
+          type: string
+          enum: [car, public_transport, walking_biking]
+          description: Primary mode of transport
+        diet:
+          type: string
+          enum: [meat_based, mixed, vegetarian_vegan]
+          description: Dietary habits
+        energy:
+          type: string
+          enum: [high, medium, low]
+          description: Home energy usage level
+        shopping:
+          type: string
+          enum: [frequent, moderate, minimal]
+          description: Shopping habits
+      required:
+        - transport
+        - diet
+        - energy
+        - shopping
+    FootprintResult:
+      type: object
+      properties:
+        score:
+          type: number
+          description: Carbon footprint score (0-100+)
+        category:
+          type: string
+          enum: [green_hero, improving, high_impact]
+          description: Category based on score
+        categoryLabel:
+          type: string
+          description: Human-readable category label
+        tips:
+          type: array
+          items:
+            type: string
+          description: AI-generated sustainability tips
+      required:
+        - score
+        - category
+        - categoryLabel
+        - tips
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
