@@ -1,2 +1,3 @@
-# EcoMark-
+# EcoMark
+
 Discover your environmental footprint.
